@@ -11,12 +11,14 @@ import { Link } from 'expo-router';
 import Checkbox from 'expo-checkbox';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStudentLogin } from '../../hooks/useAuth';
+import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
   const colorScheme = useColorScheme();
   const studentLogin = useStudentLogin();
+  const { setAuth, logout } = useAuth();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -26,6 +28,11 @@ const Login = () => {
   const handleLogin = () => {
     studentLogin.mutate(formData);
   };
+
+  useEffect(() => {
+    if (studentLogin.isSuccess)
+      setAuth({ user: studentLogin.data, verifying: false });
+  }, [studentLogin.isSuccess]);
 
   return (
     <View style={styles.container}>
@@ -42,6 +49,38 @@ const Login = () => {
       >
         Studen Login
       </InterText>
+
+      {/* Start Test */}
+
+      <Link href='/' asChild>
+        <Pressable>
+          <InterText
+            style={{
+              textAlign: 'center',
+              fontSize: 14,
+              color: Colors['light'].primary,
+              textDecorationLine: 'underline',
+            }}
+          >
+            Navigate home
+          </InterText>
+        </Pressable>
+      </Link>
+
+      <Pressable onPress={logout}>
+        <InterText
+          style={{
+            textAlign: 'center',
+            fontSize: 14,
+            marginTop: 30,
+            color: Colors['light'].primary,
+            textDecorationLine: 'underline',
+          }}
+        >
+          Logout
+        </InterText>
+      </Pressable>
+      {/* End Test */}
 
       <View style={styles.formContainer}>
         <InterText style={styles.label}>Email:</InterText>
@@ -77,7 +116,7 @@ const Login = () => {
             borderColor: Colors[colorScheme ?? 'light'].primary,
           }}
           cursorColor={'gray'}
-          secureTextEntry
+          secureTextEntry={!isPasswordShown}
         />
 
         <View style={styles.section}>

@@ -1,6 +1,6 @@
-import { router, useSegments } from 'expo-router';
-import { createContext, useState } from 'react';
-import { useStudentLogin } from '../hooks/useAuth';
+import { router, useRootNavigation, useSegments } from 'expo-router';
+import { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type User = {
   id: number;
@@ -8,49 +8,77 @@ type User = {
   fullname: string;
   profilePhoto?: string;
   course: string;
-  mobiel: string;
-};
-
-type RegisterParams = {
-  studentId: string;
-  email: string;
-  fullname: string;
-  course: string;
   college: string;
   mobile: string;
-  password: string;
 };
 
-type LoginParams = {
-  email: string;
-  password: string;
+type AuthType = {
+  user: User | null;
+  verifying: boolean;
 };
-
 interface AuthProps {
-  auth: User | null;
-  isAuthenticating: boolean;
-  register: (params: RegisterParams) => void;
-  login: (params: LoginParams) => void;
+  auth: AuthType;
+  setAuth: React.Dispatch<React.SetStateAction<AuthType>>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthProps | null>(null);
 
-const AuthProvider = ({ children }: any) => {
-  const useLogin = useStudentLogin();
-  const [auth, setAuth] = useState<User | null>(null);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
+// This hook will protect the route access based on user authentication.
+export function useProtectedRoute({ auth }: { auth: AuthType }) {
+  const [isNavigationReady, setNavigationReady] = useState(false);
+  const rootNavigation = useRootNavigation();
+  const segments = useSegments();
 
-  const register = (params: RegisterParams) => {};
-  const login = (params: LoginParams) => {
-    useLogin.mutate({
-      email: params.email,
-      password: params.password,
+  useEffect(() => {
+    const unsubscribe = rootNavigation?.addListener('state', () => {
+      setNavigationReady(true);
     });
-  };
-  const logout = () => {};
 
-  const value = { auth, isAuthenticating, register, login, logout };
+    return function cleanup() {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [rootNavigation]);
+
+  useEffect(() => {
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (!isNavigationReady || auth.verifying) return;
+
+    if (
+      // If the user is not signed in and the initial segment is not anything in the auth group.
+      !auth.user &&
+      !inAuthGroup
+    ) {
+      // Redirect to the sign-in page.
+      router.replace('/login');
+    } else if (auth.user && inAuthGroup) {
+      // Redirect away from the sign-in page.
+      router.replace('/');
+    }
+  }, [auth.user, auth.verifying, isNavigationReady, segments]);
+}
+
+const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [auth, setAuth] = useState<AuthType>({
+    user: null,
+    verifying: true,
+  });
+
+  const logout = async () => {
+    setAuth({
+      user: null,
+      verifying: false,
+    });
+    await AsyncStorage.removeItem('lnu-ilms_token');
+    router.replace('/login');
+  };
+
+  const value = { auth, setAuth, logout };
+
+  useProtectedRoute({ auth });
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -58,7 +86,7 @@ const AuthProvider = ({ children }: any) => {
 export default AuthProvider;
 
 export const useAuth = () => {
-  const context = AuthContext;
+  const context = useContext(AuthContext);
 
   if (!context) throw new Error('Context must be used within a Provider');
 

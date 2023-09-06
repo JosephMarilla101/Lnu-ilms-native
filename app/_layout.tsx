@@ -7,9 +7,10 @@ import {
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import AuthProvider from '../context/AuthContext';
+import TokenVerifier from '../components/TokenVerifier';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -58,15 +59,20 @@ function RootLayoutNav() {
     <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Stack>
-            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-            <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
-            <Stack.Screen name='login/index' options={{ headerShown: false }} />
-            <Stack.Screen
-              name='register/index'
-              options={{ headerShown: false }}
-            />
-          </Stack>
+          <TokenVerifier>
+            <Stack>
+              <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+              <Stack.Screen name='modal' options={{ presentation: 'modal' }} />
+              <Stack.Screen
+                name='(auth)/login'
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name='(auth)/register'
+                options={{ headerShown: false }}
+              />
+            </Stack>
+          </TokenVerifier>
         </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>

@@ -1,14 +1,11 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const baseUrl = 'http://192.168.8.102:8000/api';
-
 const client = axios.create({
-  baseURL: baseUrl,
+  baseURL: process.env.EXPO_PUBLIC_API_URL,
 });
 
 export const request = async ({ ...options }: AxiosRequestConfig) => {
-  // const tokenString = localStorage.getItem('token');
   const tokenString = await AsyncStorage.getItem('lnu-ilms_token');
 
   const token = tokenString ? JSON.stringify(tokenString) : null;
