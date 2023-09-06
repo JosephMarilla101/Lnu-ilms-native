@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Link } from 'expo-router';
 import Checkbox from 'expo-checkbox';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
 import { useEffect, useState } from 'react';
@@ -18,7 +19,7 @@ import { useAuth } from '../../context/AuthContext';
 const Login = () => {
   const colorScheme = useColorScheme();
   const studentLogin = useStudentLogin();
-  const { setAuth, logout } = useAuth();
+  const { setAuth } = useAuth();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -33,6 +34,14 @@ const Login = () => {
     if (studentLogin.isSuccess)
       setAuth({ user: studentLogin.data, verifying: false });
   }, [studentLogin.isSuccess]);
+
+  // clear the storage when rendering login screen
+  useEffect(() => {
+    const clearStorage = async () =>
+      await AsyncStorage.removeItem('lnu-ilms_token');
+
+    clearStorage();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -50,44 +59,13 @@ const Login = () => {
         Studen Login
       </InterText>
 
-      {/* Start Test */}
-
-      <Link href='/' asChild>
-        <Pressable>
-          <InterText
-            style={{
-              textAlign: 'center',
-              fontSize: 14,
-              color: Colors['light'].primary,
-              textDecorationLine: 'underline',
-            }}
-          >
-            Navigate home
-          </InterText>
-        </Pressable>
-      </Link>
-
-      <Pressable onPress={logout}>
-        <InterText
-          style={{
-            textAlign: 'center',
-            fontSize: 14,
-            marginTop: 30,
-            color: Colors['light'].primary,
-            textDecorationLine: 'underline',
-          }}
-        >
-          Logout
-        </InterText>
-      </Pressable>
-      {/* End Test */}
-
       <View style={styles.formContainer}>
         <InterText style={styles.label}>Email:</InterText>
         <TextInput
           editable
           maxLength={40}
           autoComplete='email'
+          autoCapitalize='none'
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, email: text }))
           }
@@ -100,12 +78,12 @@ const Login = () => {
           cursorColor={'gray'}
         />
 
-        <InterText style={{ ...styles.label, marginTop: 20 }}>
-          Password:
-        </InterText>
+        <InterText style={styles.label}>Password:</InterText>
         <TextInput
           editable
           maxLength={40}
+          autoCapitalize='none'
+          autoComplete='password'
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, password: text }))
           }
@@ -183,7 +161,7 @@ const styles = StyleSheet.create({
   formContainer: {
     maxWidth: 350,
     width: '100%',
-    marginTop: 25,
+    marginTop: 15,
   },
   section: {
     flexDirection: 'row',
@@ -200,6 +178,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 17,
+    marginTop: 15,
     width: '100%',
     color: '#000',
   },

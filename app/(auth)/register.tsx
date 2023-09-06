@@ -6,31 +6,262 @@ import {
   useColorScheme,
   TextInput,
   Pressable,
+  ScrollView,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { Link } from 'expo-router';
-import Checkbox from 'expo-checkbox';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useStudentRegistration } from '../../hooks/useStudent';
+import { useAuth } from '../../context/AuthContext';
+
+const courseSelection = [
+  'BSIT',
+  'BSTM',
+  'BSED',
+  'BPED',
+  'BSBio',
+  'BSHM',
+  'BECED',
+  'BAEL',
+  'TCP',
+  'BACOM',
+  'POLCI',
+];
+
+const collegeSelection = ['CAS', 'CME', 'COE'];
 
 const Register = () => {
   const colorScheme = useColorScheme();
-  return (
-    <View style={styles.container}>
-      <Image
-        source={require('../../assets/images/ilmslogo.png')}
-        style={styles.image}
-      />
+  const studentRegistration = useStudentRegistration();
+  const { setAuth } = useAuth();
+  const [formData, setFormData] = useState({
+    studentId: '',
+    fullname: '',
+    course: '',
+    college: '',
+    mobile: '',
+    email: '',
+    password: '',
+    password_confirmation: '',
+  });
 
-      <InterText
-        style={{
-          ...styles.title,
-          color: Colors[colorScheme ?? 'light'].secondary,
-        }}
-      >
-        Studen Registration
-      </InterText>
-    </View>
+  const handleRegister = () => {
+    studentRegistration.mutate(formData);
+  };
+
+  useEffect(() => {
+    if (studentRegistration.isSuccess)
+      setAuth({ user: studentRegistration.data, verifying: false });
+  }, [studentRegistration.isSuccess]);
+
+  return (
+    <ScrollView>
+      <View style={styles.container}>
+        <Image
+          source={require('../../assets/images/ilmslogo.png')}
+          style={styles.image}
+        />
+
+        <InterText
+          style={{
+            ...styles.title,
+            color: Colors[colorScheme ?? 'light'].secondary,
+          }}
+        >
+          Studen Registration
+        </InterText>
+
+        <View style={styles.formContainer}>
+          <InterText style={styles.label}>Student ID:</InterText>
+          <TextInput
+            editable
+            maxLength={40}
+            autoCapitalize='none'
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, studentId: text }))
+            }
+            value={formData.studentId}
+            placeholder='Student ID'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+          />
+
+          <InterText style={styles.label}>Full Name:</InterText>
+          <TextInput
+            editable
+            maxLength={40}
+            autoCapitalize='words'
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, fullname: text }))
+            }
+            value={formData.fullname}
+            placeholder='Full Name'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+          />
+
+          <InterText style={styles.label}>Email:</InterText>
+          <TextInput
+            editable
+            maxLength={40}
+            autoComplete='email'
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, email: text }))
+            }
+            value={formData.email}
+            placeholder='Email'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+          />
+
+          <InterText style={styles.label}>Mobile #:</InterText>
+          <TextInput
+            editable
+            maxLength={40}
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, mobile: text }))
+            }
+            value={formData.mobile}
+            placeholder='Mobile #'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+          />
+
+          <View style={{ flexDirection: 'row', gap: 4 }}>
+            <View style={{ flex: 0.5 }}>
+              <InterText style={styles.label}>Course:</InterText>
+              <View
+                style={{
+                  ...styles.select,
+                  borderColor: Colors[colorScheme ?? 'light'].primary,
+                }}
+              >
+                <Picker
+                  selectedValue={formData.course}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setFormData((prev) => ({ ...prev, course: itemValue }))
+                  }
+                  prompt='Course'
+                >
+                  {courseSelection.map((course, i) => {
+                    return (
+                      <Picker.Item label={course} value={course} key={i} />
+                    );
+                  })}
+                </Picker>
+              </View>
+            </View>
+
+            <View style={{ flex: 0.5 }}>
+              <InterText style={styles.label}>College:</InterText>
+              <View
+                style={{
+                  ...styles.select,
+                  borderColor: Colors[colorScheme ?? 'light'].primary,
+                }}
+              >
+                <Picker
+                  selectedValue={formData.college}
+                  onValueChange={(itemValue, itemIndex) =>
+                    setFormData((prev) => ({ ...prev, college: itemValue }))
+                  }
+                  prompt='College'
+                >
+                  {collegeSelection.map((college, i) => {
+                    return (
+                      <Picker.Item label={college} value={college} key={i} />
+                    );
+                  })}
+                </Picker>
+              </View>
+            </View>
+          </View>
+
+          <InterText style={styles.label}>Password:</InterText>
+          <TextInput
+            editable
+            maxLength={40}
+            autoCapitalize='none'
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, password: text }))
+            }
+            value={formData.password}
+            placeholder='Password'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+          />
+
+          <InterText style={styles.label}>Confirm Password:</InterText>
+          <TextInput
+            editable
+            maxLength={40}
+            autoCapitalize='none'
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, password_confirmation: text }))
+            }
+            value={formData.password_confirmation}
+            placeholder='Confirm Password'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+          />
+
+          {studentRegistration.isError && (
+            <InterText style={styles.errorText}>
+              {studentRegistration.error?.message}
+            </InterText>
+          )}
+
+          <Pressable style={styles.button} onPress={handleRegister}>
+            <Text style={styles.text}>Register</Text>
+          </Pressable>
+
+          <Link href='/login' asChild>
+            <Pressable>
+              <InterText
+                style={{
+                  textAlign: 'center',
+                  marginTop: 20,
+                  fontSize: 14,
+                  color: Colors['light'].primary,
+                }}
+              >
+                Already have an account?
+              </InterText>
+              <InterText
+                style={{
+                  textAlign: 'center',
+                  fontSize: 14,
+                  color: Colors['light'].primary,
+                  textDecorationLine: 'underline',
+                }}
+              >
+                Login here
+              </InterText>
+            </Pressable>
+          </Link>
+        </View>
+      </View>
+    </ScrollView>
   );
 };
 
@@ -43,12 +274,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#fff',
     paddingHorizontal: 20,
-    color: '#000',
+    paddingBottom: 30,
   },
   formContainer: {
     maxWidth: 350,
     width: '100%',
-    marginTop: 25,
+    marginTop: 15,
   },
   section: {
     flexDirection: 'row',
@@ -65,6 +296,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 17,
+    marginTop: 15,
     width: '100%',
     color: '#000',
   },
@@ -78,13 +310,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter',
   },
-  checkbox: {
-    margin: 8,
-    height: 20,
-    width: 20,
+  select: {
+    borderWidth: 2,
+    borderRadius: 8,
+    fontFamily: 'Inter',
   },
   checkboxLabel: {
     fontSize: 16,
+    color: 'gray',
   },
   button: {
     alignItems: 'center',
@@ -94,7 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 3,
     backgroundColor: Colors['light'].primary,
-    marginTop: 25,
+    marginTop: 15,
   },
   text: {
     fontSize: 16,
@@ -102,5 +335,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     letterSpacing: 0.25,
     color: '#fff',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    marginTop: 10,
+    width: '100%',
+    textAlign: 'center',
+    paddingHorizontal: 32,
   },
 });
