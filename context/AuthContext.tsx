@@ -4,12 +4,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type User = {
   id: number;
+  studentId: number;
   email: string;
   fullname: string;
   profilePhoto?: string;
   course: string;
   college: string;
   mobile: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 type AuthType = {
@@ -58,7 +61,7 @@ export function useProtectedRoute({ auth }: { auth: AuthType }) {
       // Redirect away from the sign-in page.
       router.replace('/');
     }
-  }, [auth.user, auth.verifying, isNavigationReady, segments]);
+  }, [auth, auth, isNavigationReady, segments]);
 }
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -68,12 +71,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const logout = async () => {
+    await AsyncStorage.removeItem('lnu-ilms_token');
+    router.replace('/login');
     setAuth({
       user: null,
       verifying: false,
     });
-    await AsyncStorage.removeItem('lnu-ilms_token');
-    router.replace('/login');
   };
 
   const value = { auth, setAuth, logout };

@@ -1,12 +1,60 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+} from 'react-native';
+import BookList from '../../components/BookList';
+import { useBookList } from '../../hooks/useBook';
+import { useCallback, useState } from 'react';
 
 const Books = () => {
+  const [isAtBottom, setIsAtBottom] = useState(false);
+  const bookList = useBookList();
+
+  const handleBottomReached = () => {
+    bookList.fetchNextPage();
+  };
+
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentSize, layoutMeasurement, contentOffset } =
+        event.nativeEvent;
+
+      // Add a treshold of 500px to trigger bottom reach early
+      const atBottom =
+        contentSize.height - contentOffset.y <= layoutMeasurement.height + 200;
+
+      if (atBottom && !isAtBottom) {
+        setIsAtBottom(true);
+        handleBottomReached();
+      } else if (!atBottom && isAtBottom) {
+        setIsAtBottom(false);
+      }
+    },
+    [isAtBottom]
+  );
+
   return (
-    <View>
-      <Text>Books</Text>
-    </View>
+    <ScrollView onScroll={handleScroll} style={styles.scroll}>
+      <View style={styles.container}>
+        <BookList />
+      </View>
+    </ScrollView>
   );
 };
 
 export default Books;
+
+const styles = StyleSheet.create({
+  scroll: {
+    backgroundColor: '#fff',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 10,
+    paddingTop: 20,
+  },
+});

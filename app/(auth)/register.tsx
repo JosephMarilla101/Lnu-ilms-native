@@ -7,6 +7,7 @@ import {
   TextInput,
   Pressable,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { Link } from 'expo-router';
@@ -15,6 +16,7 @@ import { InterText } from '../../components/StyledText';
 import { useEffect, useState } from 'react';
 import { useStudentRegistration } from '../../hooks/useStudent';
 import { useAuth } from '../../context/AuthContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const courseSelection = [
   'BSIT',
@@ -39,8 +41,8 @@ const Register = () => {
   const [formData, setFormData] = useState({
     studentId: '',
     fullname: '',
-    course: '',
-    college: '',
+    course: courseSelection[0],
+    college: collegeSelection[0],
     mobile: '',
     email: '',
     password: '',
@@ -152,7 +154,7 @@ const Register = () => {
               >
                 <Picker
                   selectedValue={formData.course}
-                  onValueChange={(itemValue, itemIndex) =>
+                  onValueChange={(itemValue) =>
                     setFormData((prev) => ({ ...prev, course: itemValue }))
                   }
                   prompt='Course'
@@ -176,7 +178,7 @@ const Register = () => {
               >
                 <Picker
                   selectedValue={formData.college}
-                  onValueChange={(itemValue, itemIndex) =>
+                  onValueChange={(itemValue) =>
                     setFormData((prev) => ({ ...prev, college: itemValue }))
                   }
                   prompt='College'
@@ -226,12 +228,37 @@ const Register = () => {
           />
 
           {studentRegistration.isError && (
-            <InterText style={styles.errorText}>
-              {studentRegistration.error?.message}
-            </InterText>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons
+                name='ios-warning-outline'
+                size={24}
+                color='red'
+                style={{ marginRight: 5 }}
+              />
+              <InterText style={styles.errorText}>
+                {studentRegistration.error?.message}
+              </InterText>
+            </View>
           )}
 
-          <Pressable style={styles.button} onPress={handleRegister}>
+          <Pressable
+            style={{ ...styles.button, flexDirection: 'row' }}
+            onPress={handleRegister}
+            disabled={studentRegistration.isLoading}
+          >
+            {studentRegistration.isLoading && (
+              <ActivityIndicator
+                size='small'
+                color='#fff'
+                style={{ marginRight: 10 }}
+              />
+            )}
             <Text style={styles.text}>Register</Text>
           </Pressable>
 
@@ -340,8 +367,8 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
     marginTop: 10,
-    width: '100%',
+    marginBottom: 10,
     textAlign: 'center',
-    paddingHorizontal: 32,
+    maxWidth: 260,
   },
 });

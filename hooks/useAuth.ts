@@ -20,12 +20,15 @@ export const useStudentLogin = () =>
 
 type VerifyTokenResponse = {
   id: number;
+  studentId: number;
   email: string;
   fullname: string;
   profilePhoto?: string;
   course: string;
   college: string;
   mobile: string;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 const verifyToken = () => request({ url: '/auth' });
