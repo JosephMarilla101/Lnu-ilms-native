@@ -59,6 +59,7 @@ const Book = ({
           text1: 'Success',
           text2: 'Borrowed book request sent!',
           position: 'top',
+          topOffset: 50,
         });
       } else if (requestBook.isError) {
         setModalVisible(false);
@@ -69,6 +70,7 @@ const Book = ({
           text1: 'Error',
           text2: `${requestBook.error.message}`,
           position: 'top',
+          topOffset: 50,
         });
       }
     }
@@ -86,6 +88,7 @@ const Book = ({
           text1: 'Success',
           text2: 'Book request cancelled successfully!',
           position: 'top',
+          topOffset: 50,
         });
       } else if (cancelRequest.isError) {
         setModalVisible(false);
@@ -96,6 +99,7 @@ const Book = ({
           text1: 'Error',
           text2: `${cancelRequest.error.message}`,
           position: 'top',
+          topOffset: 50,
         });
       }
     }
