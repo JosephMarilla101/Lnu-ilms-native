@@ -29,7 +29,7 @@ const BookList = () => {
             return (
               <View key={i}>
                 {group.map((book) => {
-                  return <Book bookId={book.id} key={book.id} />;
+                  return <Book bookId={book.id} key={book.id} type='request' />;
                 })}
               </View>
             );

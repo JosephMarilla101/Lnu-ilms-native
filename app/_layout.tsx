@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 // import { useColorScheme } from 'react-native';
 import AuthProvider from '../context/AuthContext';
 import TokenVerifier from '../components/TokenVerifier';
+import Toast from 'react-native-toast-message';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -83,6 +84,7 @@ function RootLayoutNav() {
                   }}
                 />
               </Stack>
+              <Toast />
             </MenuProvider>
           </TokenVerifier>
         </AuthProvider>

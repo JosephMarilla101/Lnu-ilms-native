@@ -71,17 +71,7 @@ export default function TabLayout() {
           <Tabs.Screen
             name='books'
             options={{
-              title: 'Book List',
-              tabBarIcon: ({ color }) => (
-                <TabBarIcon name='list' color={color} />
-              ),
-            }}
-          />
-
-          <Tabs.Screen
-            name='borrowedBooks'
-            options={{
-              title: 'Borrowed Books',
+              title: 'Books',
               tabBarIcon: ({ color }) => (
                 <TabBarIcon name='book' color={color} />
               ),

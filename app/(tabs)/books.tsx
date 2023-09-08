@@ -2,16 +2,29 @@ import {
   View,
   StyleSheet,
   ScrollView,
+  RefreshControl,
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
 import BookList from '../../components/BookList';
 import { useBookList } from '../../hooks/useBook';
 import { useCallback, useState } from 'react';
 
 const Books = () => {
+  const [refreshing, setRefreshing] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const queryClient = useQueryClient();
   const bookList = useBookList();
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    queryClient.prefetchInfiniteQuery(['bookList']);
+    queryClient.invalidateQueries(['book']);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const handleBottomReached = () => {
     bookList.fetchNextPage();
@@ -22,7 +35,7 @@ const Books = () => {
       const { contentSize, layoutMeasurement, contentOffset } =
         event.nativeEvent;
 
-      // Add a treshold of 500px to trigger bottom reach early
+      // Add a treshold of 200px to trigger bottom reach earlier
       const atBottom =
         contentSize.height - contentOffset.y <= layoutMeasurement.height + 200;
 
@@ -37,7 +50,13 @@ const Books = () => {
   );
 
   return (
-    <ScrollView onScroll={handleScroll} style={styles.scroll}>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      onScroll={handleScroll}
+      style={styles.scroll}
+    >
       <View style={styles.container}>
         <BookList />
       </View>

@@ -1,11 +1,32 @@
-import { StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { useVerifyToken } from '../../hooks/useAuth';
 import { InterText } from '../../components/StyledText';
 import Colors from '../../constants/Colors';
 import { format, parseISO } from 'date-fns';
+import { useCallback, useEffect, useState } from 'react';
 
 const Profile = () => {
-  const { auth } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+  const tokenVerification = useVerifyToken();
+  const { auth, setAuth } = useAuth();
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    // refetch profile data here
+    tokenVerification.refetch();
+
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
 
   const handleEdit = () => {
     console.log('Edit test');
@@ -17,118 +38,136 @@ const Profile = () => {
     return format(parseISO(date.toString()), 'MMM d, yyyy h:mm a');
   };
 
-  return (
-    <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: 'row',
-          width: '100%',
-          paddingHorizontal: 20,
-        }}
-      >
-        {auth.user?.profilePhoto ? (
-          <Image
-            source={{
-              uri: auth.user.profilePhoto,
-            }}
-            style={styles.image}
-          />
-        ) : (
-          <Image
-            source={require('../../assets/images/user-male.png')}
-            style={styles.image}
-          />
-        )}
+  useEffect(() => {
+    if (tokenVerification.isSuccess) {
+      setAuth({ user: tokenVerification.data, verifying: false });
+    }
+  }, [tokenVerification.isSuccess, refreshing]);
 
+  return (
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+      style={styles.scroll}
+    >
+      <View style={styles.container}>
         <View
           style={{
-            maxWidth: 210,
-            marginLeft: 10,
-            justifyContent: 'center',
+            flexDirection: 'row',
+            width: '100%',
+            paddingHorizontal: 10,
           }}
         >
-          <InterText
+          {auth.user?.profilePhoto ? (
+            <Image
+              source={{
+                uri: auth.user.profilePhoto,
+              }}
+              style={styles.image}
+            />
+          ) : (
+            <Image
+              source={require('../../assets/images/user-male.png')}
+              style={styles.image}
+            />
+          )}
+
+          <View
             style={{
-              ...styles.text,
-              fontWeight: '700',
-              fontSize: 26,
+              maxWidth: 210,
+              marginLeft: 10,
+              justifyContent: 'center',
             }}
           >
-            {`${auth.user?.fullname}`}
-          </InterText>
-          <InterText style={styles.text}>
-            {`${auth.user?.studentId} (${auth.user?.course})`}
-          </InterText>
+            <InterText
+              style={{
+                ...styles.text,
+                fontWeight: '700',
+                fontSize: 26,
+              }}
+            >
+              {`${auth.user?.fullname}`}
+            </InterText>
+            <InterText style={styles.text}>
+              {`${auth.user?.studentId} (${auth.user?.course})`}
+            </InterText>
 
-          <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.button}
-            onPress={handleEdit}
-          >
-            <InterText style={{ color: '#fff' }}>Edit Profile</InterText>
-          </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              style={styles.button}
+              onPress={handleEdit}
+            >
+              <InterText style={{ color: '#fff' }}>Edit Profile</InterText>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.information}>
+          <InterText style={styles.header}>Profile Information</InterText>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Student #:</InterText>
+            <InterText style={styles.textData}>
+              {auth.user?.studentId}
+            </InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Full Name:</InterText>
+            <InterText style={styles.textData}>{auth.user?.fullname}</InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>College:</InterText>
+            <InterText style={styles.textData}>{auth.user?.college}</InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Course:</InterText>
+            <InterText style={styles.textData}>{auth.user?.course}</InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Email:</InterText>
+            <InterText style={styles.textData}>{auth.user?.email}</InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Mobile:</InterText>
+            <InterText style={styles.textData}>{auth.user?.mobile}</InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Reg Date:</InterText>
+            <InterText style={styles.textData}>
+              {formatDate(auth.user?.createdAt)}
+            </InterText>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <InterText style={styles.textDesc}>Update Date:</InterText>
+            <InterText style={styles.textData}>
+              {formatDate(auth.user?.updatedAt)}
+            </InterText>
+          </View>
         </View>
       </View>
-
-      <View style={styles.information}>
-        <InterText style={styles.header}>Profile Information</InterText>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Student #:</InterText>
-          <InterText style={styles.textData}>{auth.user?.studentId}</InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Full Name:</InterText>
-          <InterText style={styles.textData}>{auth.user?.fullname}</InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>College:</InterText>
-          <InterText style={styles.textData}>{auth.user?.college}</InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Course:</InterText>
-          <InterText style={styles.textData}>{auth.user?.course}</InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Email:</InterText>
-          <InterText style={styles.textData}>{auth.user?.email}</InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Mobile:</InterText>
-          <InterText style={styles.textData}>{auth.user?.mobile}</InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Reg Date:</InterText>
-          <InterText style={styles.textData}>
-            {formatDate(auth.user?.createdAt)}
-          </InterText>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <InterText style={styles.textDesc}>Update Date:</InterText>
-          <InterText style={styles.textData}>
-            {formatDate(auth.user?.updatedAt)}
-          </InterText>
-        </View>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
 export default Profile;
 
 const styles = StyleSheet.create({
+  scroll: {
+    backgroundColor: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    paddingTop: 10,
+    paddingTop: 20,
     paddingHorizontal: 10,
   },
   information: {
