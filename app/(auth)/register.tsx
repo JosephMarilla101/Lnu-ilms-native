@@ -13,9 +13,8 @@ import { Picker } from '@react-native-picker/picker';
 import { Link } from 'expo-router';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useStudentRegistration } from '../../hooks/useStudent';
-import { useAuth } from '../../context/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const courseSelection = [
@@ -37,7 +36,7 @@ const collegeSelection = ['CAS', 'CME', 'COE'];
 const Register = () => {
   const colorScheme = useColorScheme();
   const studentRegistration = useStudentRegistration();
-  const { setAuth } = useAuth();
+
   const [formData, setFormData] = useState({
     studentId: '',
     fullname: '',
@@ -52,11 +51,6 @@ const Register = () => {
   const handleRegister = () => {
     studentRegistration.mutate(formData);
   };
-
-  useEffect(() => {
-    if (studentRegistration.isSuccess)
-      setAuth({ user: studentRegistration.data, verifying: false });
-  }, [studentRegistration.isSuccess]);
 
   return (
     <ScrollView>

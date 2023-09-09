@@ -15,6 +15,7 @@ import {
   useCancelRequest,
   useGetRequestedBook,
 } from '../hooks/useBook';
+import { useAuth } from '../context/AuthContext';
 import Colors from '../constants/Colors';
 import { useEffect, useState } from 'react';
 
@@ -26,6 +27,7 @@ const Book = ({
   type: 'request' | 'return' | 'cancel';
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const { auth } = useAuth();
   const book = useGetBook(bookId);
   const requestBook = useRequestBook();
   const cancelRequest = useCancelRequest();
@@ -36,7 +38,7 @@ const Book = ({
   };
 
   const handleCancelRequest = () => {
-    cancelRequest.mutate({ bookId });
+    cancelRequest.mutate({ bookId, studentId: auth.user?.id ?? 0 });
   };
 
   const handleRequestBook = () => {
