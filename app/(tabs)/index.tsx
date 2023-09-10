@@ -4,16 +4,24 @@ import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
 import { useCallback, useState } from 'react';
 import Book from '../../components/Book';
-import { useGetRequestedBook } from '../../hooks/useBook';
-import { format, parseISO } from 'date-fns';
+import {
+  useGetRequestedBook,
+  useGetUnreturnedBook,
+  useGetBookLateFee,
+} from '../../hooks/useBook';
+import { format, parseISO, differenceInDays, isAfter } from 'date-fns';
 
 export default function TabHomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const requestedBook = useGetRequestedBook();
+  const unreturnedBook = useGetUnreturnedBook();
+  const getBookLateFee = useGetBookLateFee();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    getBookLateFee.refetch();
     requestedBook.refetch();
+    unreturnedBook.refetch();
 
     setTimeout(() => {
       setRefreshing(false);
@@ -39,6 +47,41 @@ export default function TabHomeScreen() {
       />
     );
   }
+
+  const calculateLateFee = (): number => {
+    if (getBookLateFee.isLoading || !getBookLateFee.data) return 0;
+    if (unreturnedBook.isLoading || !unreturnedBook.data) return 0;
+
+    const currentDateAndTime = new Date();
+    const dateDue = parseISO(unreturnedBook.data.dueDate.toString());
+
+    const daysLate = differenceInDays(currentDateAndTime, dateDue);
+
+    let lateFee = 0;
+    if (isAfter(currentDateAndTime, dateDue))
+      lateFee = lateFee + getBookLateFee.data.initialFee;
+
+    // add the followingDateFee if late for more than 1 day
+    if (daysLate >= 1) {
+      for (let i = daysLate; i >= 1; i--) {
+        lateFee = lateFee + getBookLateFee.data.followingDateFee;
+      }
+    }
+
+    return lateFee;
+  };
+
+  const isDue = (): boolean => {
+    if (unreturnedBook.isLoading || !unreturnedBook.data) return false;
+
+    const currentDateAndTime = new Date();
+    const dateDue = parseISO(unreturnedBook.data.dueDate.toString());
+
+    const daysLate = differenceInDays(currentDateAndTime, dateDue);
+
+    if (isAfter(currentDateAndTime, dateDue)) return true;
+    else return false;
+  };
 
   return (
     <ScrollView
@@ -158,6 +201,76 @@ export default function TabHomeScreen() {
 
               <InterText style={[styles.text, styles.description]}>
                 {formatDate(requestedBook.data.requestDate)}
+              </InterText>
+            </View>
+          </View>
+        )}
+
+        {unreturnedBook.data && (
+          <View style={styles.requestedContainer}>
+            <InterText
+              style={[
+                styles.text,
+                {
+                  fontSize: 18,
+                  color: Colors['light'].primary,
+                  fontWeight: '700',
+                  fontStyle: 'italic',
+                  marginBottom: 8,
+                  marginLeft: 5,
+                },
+                { color: isDue() ? 'red' : Colors['light'].primary },
+              ]}
+            >
+              Unreturned Book...
+            </InterText>
+
+            <Book bookId={unreturnedBook.data.book.id} type='unreturn' />
+            <View style={styles.textContainer}>
+              <InterText style={[styles.text, styles.heading]}>
+                Status:
+              </InterText>
+
+              <InterText
+                style={[
+                  styles.text,
+                  styles.description,
+                  { color: isDue() ? 'red' : Colors['light'].primary },
+                ]}
+              >
+                {`${isDue() ? 'Due' : 'Unreturned'}`}
+              </InterText>
+            </View>
+
+            <View style={styles.textContainer}>
+              <InterText style={[styles.text, styles.heading]}>
+                Due Date:
+              </InterText>
+
+              <InterText
+                style={[
+                  styles.text,
+                  styles.description,
+                  { color: isDue() ? 'red' : Colors['light'].primary },
+                ]}
+              >
+                {formatDate(unreturnedBook.data.dueDate)}
+              </InterText>
+            </View>
+
+            <View style={styles.textContainer}>
+              <InterText style={[styles.text, styles.heading]}>
+                Late Fee:
+              </InterText>
+
+              <InterText
+                style={[
+                  styles.text,
+                  styles.description,
+                  { color: isDue() ? 'red' : Colors['light'].primary },
+                ]}
+              >
+                {`₱ ${calculateLateFee().toFixed(2)}`}
               </InterText>
             </View>
           </View>

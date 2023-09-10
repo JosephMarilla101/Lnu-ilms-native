@@ -24,7 +24,7 @@ const Book = ({
   type,
 }: {
   bookId: number;
-  type: 'request' | 'return' | 'cancel';
+  type: 'request' | 'unreturn' | 'cancel';
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { auth } = useAuth();
@@ -34,6 +34,8 @@ const Book = ({
   const requestedBook = useGetRequestedBook();
 
   const handleBookPress = () => {
+    if (type === 'unreturn') return;
+
     setModalVisible(true);
   };
 
@@ -165,7 +167,12 @@ const Book = ({
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <View style={{ flexDirection: 'row', marginBottom: 20 }}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  marginBottom: 20,
+                }}
+              >
                 <View style={styles.modalCard}>
                   {book.data?.bookCover ? (
                     <Image
@@ -250,7 +257,7 @@ const Book = ({
                     <InterText style={styles.textStyle}>
                       {type === 'request'
                         ? 'Request Book'
-                        : type === 'return'
+                        : type === 'unreturn'
                         ? 'Return Book'
                         : 'Cancel Request'}
                     </InterText>

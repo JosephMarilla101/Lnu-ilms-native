@@ -37,6 +37,29 @@ const getRequestedBook = () => request({ url: '/book/requested' });
 export const useGetRequestedBook = (): UseQueryResult<BookRequestResponse> =>
   useQuery(['book', 'requested'], getRequestedBook);
 
+const getBookLateFee = () => request({ url: '/book/late_fee' });
+
+type LateFee = {
+  initialFee: number;
+  followingDateFee: number;
+};
+
+export const useGetBookLateFee = (): UseQueryResult<LateFee> =>
+  useQuery(['book', 'latefee'], getBookLateFee, {
+    onError: (error: ErrorResponse) => error,
+  });
+
+type UnreturnedBook = {
+  book: Book;
+  isReturn: true;
+  dueDate: Date;
+};
+
+const getUnreturnedBook = () => request({ url: '/book/unreturned' });
+
+export const useGetUnreturnedBook = (): UseQueryResult<UnreturnedBook> =>
+  useQuery(['book', 'unreturned'], getUnreturnedBook);
+
 type InfiniteQueryBookList = [{ id: number }];
 
 const fetchBookList = ({ pageParam = undefined }: { pageParam?: unknown }) =>
