@@ -88,7 +88,7 @@ export const useRequestBook = () =>
   });
 
 const cancelRequest = (data: { bookId: number; studentId: number }) =>
-  request({ url: '/book/cancel_request', method: 'post', data });
+  request({ url: '/book/cancel_request', method: 'delete', data });
 
 export const useCancelRequest = () =>
   useMutation(cancelRequest, {

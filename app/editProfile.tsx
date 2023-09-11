@@ -16,7 +16,7 @@ import { InterText } from '../components/StyledText';
 import { useEffect, useState } from 'react';
 import Colors from '../constants/Colors';
 import { useUpdateProfile } from '../hooks/useStudent';
-import { useAuth } from '../context/AuthContext';
+import { useVerifyToken } from '../hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 
 const courseSelection = [
@@ -36,15 +36,15 @@ const courseSelection = [
 const collegeSelection = ['CAS', 'CME', 'COE'];
 
 export default function ModalScreen() {
-  const { auth } = useAuth();
+  const auth = useVerifyToken();
   const colorScheme = useColorScheme();
   const updateProfile = useUpdateProfile();
   const [formData, setFormData] = useState({
-    fullname: auth.user?.fullname ?? '',
-    course: auth.user?.course ?? courseSelection[0],
-    college: auth.user?.college ?? collegeSelection[0],
-    mobile: auth.user?.mobile ?? '',
-    email: auth.user?.email ?? '',
+    fullname: auth.data?.fullname ?? '',
+    course: auth.data?.course ?? courseSelection[0],
+    college: auth.data?.college ?? collegeSelection[0],
+    mobile: auth.data?.mobile ?? '',
+    email: auth.data?.email ?? '',
   });
 
   const handleUpdateProfile = () => {

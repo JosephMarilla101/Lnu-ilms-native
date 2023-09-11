@@ -14,9 +14,9 @@ import {
   useRequestBook,
   useCancelRequest,
   useGetRequestedBook,
+  useGetUnreturnedBook,
 } from '../hooks/useBook';
 import { useVerifyToken } from '../hooks/useAuth';
-import { useAuth } from '../context/AuthContext';
 import Colors from '../constants/Colors';
 import { useEffect, useState } from 'react';
 
@@ -29,11 +29,11 @@ const Book = ({
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const auth = useVerifyToken();
-  // const { auth } = useAuth();
   const book = useGetBook(bookId);
   const requestBook = useRequestBook();
   const cancelRequest = useCancelRequest();
   const requestedBook = useGetRequestedBook();
+  const unreturnedBook = useGetUnreturnedBook();
 
   const handleBookPress = () => {
     if (type === 'unreturn') return;
@@ -51,13 +51,15 @@ const Book = ({
   };
 
   const handleReturnBook = () => {
-    console.log('Return book');
+    return;
   };
 
   useEffect(() => {
     if (type === 'request') {
       if (requestBook.isSuccess && type) {
         requestedBook.refetch();
+        unreturnedBook.refetch();
+
         setModalVisible(false);
         requestBook.reset();
 

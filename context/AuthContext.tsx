@@ -61,7 +61,7 @@ export function useProtectedRoute({ auth }: { auth: AuthType }) {
       // Redirect away from the sign-in page.
       router.replace('/');
     }
-  }, [auth, auth, isNavigationReady, segments]);
+  }, [auth.user, auth.verifying, isNavigationReady, segments]);
 }
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
