@@ -66,7 +66,7 @@ const Register = () => {
             color: Colors[colorScheme ?? 'light'].secondary,
           }}
         >
-          Studen Registration
+          Student Registration
         </InterText>
 
         <View style={styles.formContainer}>
