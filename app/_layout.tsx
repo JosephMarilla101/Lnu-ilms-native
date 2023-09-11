@@ -83,7 +83,27 @@ function RootLayoutNav() {
                     headerTintColor: '#000',
                   }}
                 />
+                <Stack.Screen
+                  name='editProfile'
+                  options={{
+                    headerTitleAlign: 'center',
+                    title: 'Edit Profile',
+                    presentation: 'modal',
+                    animation: 'fade_from_bottom',
+                  }}
+                />
+
+                <Stack.Screen
+                  name='changePassword'
+                  options={{
+                    headerTitleAlign: 'center',
+                    title: 'Change Password',
+                    presentation: 'modal',
+                    animation: 'fade_from_bottom',
+                  }}
+                />
               </Stack>
+
               <Toast />
             </MenuProvider>
           </TokenVerifier>

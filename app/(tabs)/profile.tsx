@@ -2,10 +2,11 @@ import {
   StyleSheet,
   View,
   Image,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   RefreshControl,
 } from 'react-native';
+import { Link } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { useVerifyToken } from '../../hooks/useAuth';
 import { InterText } from '../../components/StyledText';
@@ -27,10 +28,6 @@ const Profile = () => {
       setRefreshing(false);
     }, 2000);
   }, []);
-
-  const handleEdit = () => {
-    console.log('Edit test');
-  };
 
   const formatDate = (date?: Date) => {
     if (!date) return;
@@ -93,13 +90,11 @@ const Profile = () => {
               {`${auth.user?.studentId} (${auth.user?.course})`}
             </InterText>
 
-            <TouchableOpacity
-              activeOpacity={0.7}
-              style={styles.button}
-              onPress={handleEdit}
-            >
-              <InterText style={{ color: '#fff' }}>Edit Profile</InterText>
-            </TouchableOpacity>
+            <Link href='/editProfile' asChild>
+              <Pressable style={styles.button}>
+                <InterText style={{ color: '#fff' }}>Edit Profile</InterText>
+              </Pressable>
+            </Link>
           </View>
         </View>
 

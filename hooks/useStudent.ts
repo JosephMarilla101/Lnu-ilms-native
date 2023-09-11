@@ -28,6 +28,37 @@ export const useStudentRegistration = () => {
   });
 };
 
+const updateProfile = (data: {
+  email: string;
+  fullname: string;
+  course: string;
+  college: string;
+  mobile: string;
+}) => request({ url: '/student', method: 'put', data });
+
+export const useUpdateProfile = () => {
+  const queryClient = useQueryClient();
+  const { setAuth } = useAuth();
+  return useMutation(updateProfile, {
+    onSuccess: async (data) => {
+      queryClient.setQueriesData(['auth'], data);
+      setAuth({ user: data, verifying: false });
+    },
+    onError: (error: ErrorResponse) => error,
+  });
+};
+
+const changePassword = (data: {
+  current_password: string;
+  new_password: string;
+  password_confirmation: string;
+}) => request({ url: '/student/change_password', method: 'put', data });
+
+export const useChangePassword = () =>
+  useMutation(changePassword, {
+    onError: (error: ErrorResponse) => error,
+  });
+
 type ErrorResponse = {
   message?: string;
 };

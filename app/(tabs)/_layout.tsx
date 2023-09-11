@@ -101,7 +101,7 @@ export default function TabLayout() {
                         placement: 'bottom',
                       }}
                     >
-                      <MenuTrigger style={{ padding: 10 }}>
+                      <MenuTrigger style={{ padding: 10, marginRight: 10 }}>
                         <TabBarIcon name='cog' color={Colors['dark'].primary} />
                       </MenuTrigger>
                       <MenuOptions
