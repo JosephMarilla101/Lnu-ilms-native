@@ -15,10 +15,13 @@ import {
   useTotalRequestedBooks,
   useTotalBorrowedBooks,
 } from '../../hooks/useDashboard';
+import { useVerifyToken } from '../../hooks/useAuth';
 import { format, parseISO, differenceInDays, isAfter } from 'date-fns';
 
 export default function TabHomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
+  const authVerifier = useVerifyToken();
+
   const requestedBook = useGetRequestedBook();
   const unreturnedBook = useGetUnreturnedBook();
   const getBookLateFee = useGetBookLateFee();
@@ -30,6 +33,8 @@ export default function TabHomeScreen() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    authVerifier.refetch();
+
     getBookLateFee.refetch();
     requestedBook.refetch();
     unreturnedBook.refetch();

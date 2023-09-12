@@ -9,16 +9,20 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import BookList from '../../components/BookList';
 import { useBookList } from '../../hooks/useBook';
+import { useVerifyToken } from '../../hooks/useAuth';
 import { useCallback, useState } from 'react';
 
 const Books = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+  const authVerifier = useVerifyToken();
   const queryClient = useQueryClient();
   const bookList = useBookList();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
+    authVerifier.refetch();
+
     queryClient.prefetchInfiniteQuery(['bookList']);
     queryClient.invalidateQueries(['book']);
     setTimeout(() => {
