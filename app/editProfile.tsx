@@ -11,11 +11,13 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker';
 import { Link, router } from 'expo-router';
 import { InterText } from '../components/StyledText';
 import { useEffect, useState } from 'react';
 import Colors from '../constants/Colors';
-import { useUpdateProfile } from '../hooks/useStudent';
+import { useUpdateProfile, useUpdateProfilePhoto } from '../hooks/useStudent';
+import { useImageUpload } from '../hooks/useImageUpload';
 import { useVerifyToken } from '../hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -39,6 +41,8 @@ export default function ModalScreen() {
   const auth = useVerifyToken();
   const colorScheme = useColorScheme();
   const updateProfile = useUpdateProfile();
+  const updateProfilePhoto = useUpdateProfilePhoto();
+  const imageUploader = useImageUpload();
   const [formData, setFormData] = useState({
     fullname: auth.data?.fullname ?? '',
     course: auth.data?.course ?? courseSelection[0],
@@ -47,12 +51,52 @@ export default function ModalScreen() {
     email: auth.data?.email ?? '',
   });
 
-  const handleUpdateProfile = () => {
+  const [image, setImage] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null | undefined>(
+    null
+  );
+  const pickImage = async () => {
+    try {
+      // No permissions request is necessary for launching the image library
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: false,
+        aspect: [4, 3],
+        quality: 1,
+        base64: true,
+      });
+
+      if (!result.canceled) {
+        setImageBase64(result.assets[0].base64);
+        setImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    if (imageBase64) {
+      const res = await imageUploader.mutateAsync(
+        'data:image/jpg;base64,' + imageBase64
+      );
+
+      if (res.status === 200) {
+        updateProfilePhoto.mutateAsync({
+          profilePhoto: res.data.secure_url,
+          profilePhotoId: res.data.public_id,
+        });
+      }
+    }
     updateProfile.mutate(formData);
   };
 
   useEffect(() => {
     if (updateProfile.isSuccess) {
+      updateProfile.reset();
+      imageUploader.reset();
+      updateProfilePhoto.reset();
+      setImage(null);
       setFormData({
         fullname: '',
         course: courseSelection[0],
@@ -75,6 +119,84 @@ export default function ModalScreen() {
     <ScrollView style={{ backgroundColor: '#fff' }}>
       <View style={styles.container}>
         <View style={styles.formContainer}>
+          <View
+            style={{
+              alignItems: 'center',
+            }}
+          >
+            {!image ? (
+              <>
+                {auth.data?.profilePhoto ? (
+                  <Image
+                    source={{
+                      uri: auth.data?.profilePhoto,
+                    }}
+                    style={styles.image}
+                  />
+                ) : (
+                  <Image
+                    source={require('../assets/images/user-male.png')}
+                    style={styles.image}
+                  />
+                )}
+              </>
+            ) : (
+              <Image
+                source={{
+                  uri: image,
+                }}
+                style={styles.image}
+              />
+            )}
+
+            {!image ? (
+              <Pressable
+                style={{ ...styles.button2, flexDirection: 'row' }}
+                onPress={pickImage}
+                disabled={
+                  imageUploader.isLoading || updateProfilePhoto.isLoading
+                }
+              >
+                {/* {(imageUploader.isLoading || updateProfilePhoto.isLoading) && (
+                <ActivityIndicator
+                  size='small'
+                  color='#fff'
+                  style={{ marginRight: 10 }}
+                />
+              )} */}
+                <InterText style={{ color: '#fff' }}>Choose Image</InterText>
+              </Pressable>
+            ) : (
+              <Pressable
+                style={{ ...styles.button2, flexDirection: 'row' }}
+                onPress={() => {
+                  setImageBase64(null);
+                  setImage(null);
+                }}
+                disabled={
+                  imageUploader.isLoading || updateProfilePhoto.isLoading
+                }
+              >
+                <InterText style={{ color: '#fff' }}>Cancel</InterText>
+              </Pressable>
+            )}
+          </View>
+
+          {/* <View
+            style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <Button
+              title='Pick an image from camera roll'
+              onPress={pickImage}
+            />
+            {image && (
+              <Image
+                source={{ uri: image }}
+                style={{ width: 200, height: 200 }}
+              />
+            )}
+          </View> */}
+
           <InterText style={styles.label}>Full Name:</InterText>
           <TextInput
             editable
@@ -198,9 +320,15 @@ export default function ModalScreen() {
           <Pressable
             style={{ ...styles.button, flexDirection: 'row' }}
             onPress={handleUpdateProfile}
-            disabled={updateProfile.isLoading}
+            disabled={
+              updateProfile.isLoading ||
+              imageUploader.isLoading ||
+              updateProfilePhoto.isLoading
+            }
           >
-            {updateProfile.isLoading && (
+            {(updateProfile.isLoading ||
+              imageUploader.isLoading ||
+              updateProfilePhoto.isLoading) && (
               <ActivityIndicator
                 size='small'
                 color='#fff'
@@ -263,8 +391,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   image: {
-    width: 220,
-    resizeMode: 'contain',
+    resizeMode: 'cover',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
   },
   label: {
     fontSize: 17,
@@ -300,6 +431,17 @@ const styles = StyleSheet.create({
     elevation: 3,
     backgroundColor: Colors['light'].primary,
     marginTop: 30,
+  },
+  button2: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+    elevation: 3,
+    backgroundColor: Colors['light'].primary,
+    marginTop: 10,
+    width: 160,
   },
   text: {
     fontSize: 16,

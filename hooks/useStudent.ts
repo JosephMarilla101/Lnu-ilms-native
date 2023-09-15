@@ -59,6 +59,23 @@ export const useChangePassword = () =>
     onError: (error: ErrorResponse) => error,
   });
 
+const updateProfilePhoto = (data: {
+  profilePhoto: string;
+  profilePhotoId: string;
+}) => request({ url: '/student/profile_photo', method: 'put', data });
+
+export const useUpdateProfilePhoto = () => {
+  const queryClient = useQueryClient();
+  const { setAuth } = useAuth();
+  return useMutation(updateProfilePhoto, {
+    onSuccess: async (data) => {
+      queryClient.setQueriesData(['auth'], data);
+      setAuth({ user: data, verifying: false });
+    },
+    onError: (error: ErrorResponse) => error,
+  });
+};
+
 type ErrorResponse = {
   message?: string;
 };
