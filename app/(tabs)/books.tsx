@@ -5,19 +5,26 @@ import {
   RefreshControl,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  TextInput,
+  useColorScheme,
+  ActivityIndicator,
 } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import BookList from '../../components/BookList';
 import { useBookList } from '../../hooks/useBook';
 import { useVerifyToken } from '../../hooks/useAuth';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import Colors from '../../constants/Colors';
 
 const Books = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [isAtBottom, setIsAtBottom] = useState(false);
+
+  const [filter, setFilter] = useState('');
   const authVerifier = useVerifyToken();
   const queryClient = useQueryClient();
-  const bookList = useBookList();
+  const colorScheme = useColorScheme();
+  const bookList = useBookList(filter);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -53,6 +60,10 @@ const Books = () => {
     [isAtBottom]
   );
 
+  useEffect(() => {
+    bookList.refetch();
+  }, [filter]);
+
   return (
     <ScrollView
       refreshControl={
@@ -62,7 +73,36 @@ const Books = () => {
       style={styles.scroll}
     >
       <View style={styles.container}>
-        <BookList />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 20,
+          }}
+        >
+          <TextInput
+            editable
+            maxLength={40}
+            onChangeText={(text) => setFilter(text)}
+            value={filter}
+            placeholder='Search Books'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+            }}
+            cursorColor={'gray'}
+            autoFocus={false}
+          />
+
+          {filter && bookList.isFetching && (
+            <ActivityIndicator
+              size='large'
+              color='blue'
+              style={{ marginLeft: 10 }}
+            />
+          )}
+        </View>
+        <BookList filter={filter} />
       </View>
     </ScrollView>
   );
@@ -79,5 +119,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 10,
     paddingTop: 20,
+  },
+  input: {
+    width: '100%',
+    maxWidth: 220,
+    height: 50,
+    borderWidth: 2,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    fontSize: 16,
+    fontFamily: 'Inter',
   },
 });

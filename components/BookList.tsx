@@ -3,8 +3,9 @@ import { InterText } from './StyledText';
 import Book from './Book';
 import { useBookList } from '../hooks/useBook';
 
-const BookList = () => {
-  const bookList = useBookList();
+const BookList = ({ filter }: { filter: string }) => {
+  const bookList = useBookList(filter);
+
   return (
     <View>
       {bookList.isLoading ? (

@@ -62,16 +62,20 @@ export const useGetUnreturnedBook = (): UseQueryResult<UnreturnedBook> =>
 
 type InfiniteQueryBookList = [{ id: number }];
 
-const fetchBookList = ({ pageParam = undefined }: { pageParam?: unknown }) =>
-  request({ url: `/book/list/?cursor=${pageParam}` });
+const fetchBookList = ({
+  pageParam = undefined,
+  filter = '',
+}: {
+  pageParam?: unknown;
+  filter?: string;
+}) => request({ url: `/book/list/?cursor=${pageParam}&filter=${filter}` });
 
-export const useBookList = (): UseInfiniteQueryResult<
-  InfiniteQueryBookList,
-  Error
-> =>
+export const useBookList = (
+  filter: string
+): UseInfiniteQueryResult<InfiniteQueryBookList, Error> =>
   useInfiniteQuery({
     queryKey: ['bookList'],
-    queryFn: fetchBookList,
+    queryFn: (context) => fetchBookList({ ...context, filter }),
     getNextPageParam: (lastPage) => {
       const lastPost = lastPage[lastPage.length - 1];
       // return the book id as cursor for next page request
