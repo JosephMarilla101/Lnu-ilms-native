@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Link } from 'expo-router';
-import Checkbox from 'expo-checkbox';
+// import Checkbox from 'expo-checkbox';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
@@ -83,25 +83,40 @@ const Login = () => {
         />
 
         <InterText style={styles.label}>Password:</InterText>
-        <TextInput
-          editable
-          maxLength={40}
-          autoCapitalize='none'
-          autoComplete='password'
-          onChangeText={(text) =>
-            setFormData((prev) => ({ ...prev, password: text }))
-          }
-          value={formData.password}
-          placeholder='Password'
-          style={{
-            ...styles.input,
-            borderColor: Colors[colorScheme ?? 'light'].primary,
-          }}
-          cursorColor={'gray'}
-          secureTextEntry={!isPasswordShown}
-        />
+        <View style={{ position: 'relative', marginBottom: 20 }}>
+          <TextInput
+            editable
+            maxLength={40}
+            autoCapitalize='none'
+            autoComplete='password'
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, password: text }))
+            }
+            value={formData.password}
+            placeholder='Password'
+            style={{
+              ...styles.input,
+              borderColor: Colors[colorScheme ?? 'light'].primary,
+              paddingRight: 40,
+            }}
+            cursorColor={'gray'}
+            secureTextEntry={!isPasswordShown}
+          />
 
-        <View style={styles.section}>
+          <Ionicons
+            name={isPasswordShown ? 'eye' : 'eye-off'}
+            size={24}
+            color='gray'
+            style={{
+              position: 'absolute',
+              top: 16,
+              right: 12,
+            }}
+            onPress={() => setIsPasswordShown((prev) => !prev)}
+          />
+        </View>
+
+        {/* <View style={styles.section}>
           <Checkbox
             style={styles.checkbox}
             value={isPasswordShown}
@@ -111,7 +126,7 @@ const Login = () => {
           <Pressable onPress={() => setIsPasswordShown(!isPasswordShown)}>
             <InterText style={styles.checkboxLabel}>Show password</InterText>
           </Pressable>
-        </View>
+        </View> */}
 
         {studentLogin.isError && (
           <View
