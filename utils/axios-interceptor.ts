@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const baseURL = 'http://192.168.8.102:8000/api';
-// const baseURL = 'https://lnu-ilms-api.onrender.com/api';
+// const baseURL = 'http://192.168.234.71:8000/api';
+const baseURL = 'https://lnu-ilms-api-m5za.onrender.com/api';
 
 const client = axios.create({
   baseURL,

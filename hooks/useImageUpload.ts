@@ -9,7 +9,7 @@ export const useImageUpload = () => {
     mutationKey: ['imageUpload'],
     mutationFn: async (img: string) => {
       const cloudinaryForm = new FormData();
-      const cloudName = 'dachbgiue';
+      const cloudName = 'deyxunbof';
       cloudinaryForm.append('file', img);
       cloudinaryForm.append('upload_preset', 'lnu-ilms');
 

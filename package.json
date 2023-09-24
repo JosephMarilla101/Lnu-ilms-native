@@ -23,6 +23,7 @@
     "expo": "~49.0.8",
     "expo-checkbox": "~2.4.0",
     "expo-font": "~11.4.0",
+    "expo-image-picker": "~14.3.2",
     "expo-linking": "~5.0.2",
     "expo-router": "2.0.0",
     "expo-splash-screen": "~0.20.5",
@@ -38,7 +39,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-toast-message": "^2.1.6",
     "react-native-web": "~0.19.6",
-    "expo-image-picker": "~14.3.2"
+    "run": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
