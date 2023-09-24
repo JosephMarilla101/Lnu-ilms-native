@@ -9,9 +9,10 @@ import {
   useColorScheme,
   ActivityIndicator,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useQueryClient } from '@tanstack/react-query';
 import BookList from '../../components/BookList';
-import { useBookList } from '../../hooks/useBook';
+import { useBookList, useGetActiveCategories } from '../../hooks/useBook';
 import { useVerifyToken } from '../../hooks/useAuth';
 import { useCallback, useEffect, useState } from 'react';
 import Colors from '../../constants/Colors';
@@ -21,10 +22,12 @@ const Books = () => {
   const [isAtBottom, setIsAtBottom] = useState(false);
 
   const [filter, setFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
   const authVerifier = useVerifyToken();
   const queryClient = useQueryClient();
   const colorScheme = useColorScheme();
-  const bookList = useBookList(filter);
+  const activeCategories = useGetActiveCategories();
+  const bookList = useBookList(filter, categoryFilter);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -62,7 +65,7 @@ const Books = () => {
 
   useEffect(() => {
     bookList.refetch();
-  }, [filter]);
+  }, [filter, categoryFilter]);
 
   return (
     <ScrollView
@@ -94,15 +97,25 @@ const Books = () => {
             autoFocus={false}
           />
 
-          {filter && bookList.isFetching && (
-            <ActivityIndicator
-              size='large'
-              color='blue'
-              style={{ marginLeft: 10 }}
-            />
-          )}
+          <View style={{ flex: 1 }}>
+            <Picker
+              selectedValue={categoryFilter}
+              onValueChange={(itemValue) => setCategoryFilter(itemValue)}
+              prompt='Category'
+            >
+              <Picker.Item label='None' value='' />
+              {activeCategories.data &&
+                activeCategories.data.map((category) => (
+                  <Picker.Item
+                    label={category.name}
+                    value={category.name}
+                    key={category.id}
+                  />
+                ))}
+            </Picker>
+          </View>
         </View>
-        <BookList filter={filter} />
+        <BookList filter={filter} category={categoryFilter} />
       </View>
     </ScrollView>
   );
