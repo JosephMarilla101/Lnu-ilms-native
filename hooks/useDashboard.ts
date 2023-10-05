@@ -21,11 +21,27 @@ export const useTotalRequestedBooks = (): UseQueryResult<ResponseType> =>
     onError: (error: ErrorResponse) => error,
   });
 
+const myTotalRequestedBooks = () =>
+  request({ url: '/dashboard/my_total_requested_books' });
+
+export const useMyTotalRequestedBooks = (): UseQueryResult<ResponseType> =>
+  useQuery(['my_total_requested_books'], myTotalRequestedBooks, {
+    onError: (error: ErrorResponse) => error,
+  });
+
 const totalBorrowedBooks = () =>
   request({ url: '/dashboard/total_borrowed_books' });
 
 export const useTotalBorrowedBooks = (): UseQueryResult<ResponseType> =>
   useQuery(['total_borrowed_books'], totalBorrowedBooks, {
+    onError: (error: ErrorResponse) => error,
+  });
+
+const myTotalBorrowedBooks = () =>
+  request({ url: '/dashboard/my_total_borrowed_books' });
+
+export const useMyTotalBorrowedBooks = (): UseQueryResult<ResponseType> =>
+  useQuery(['my_total_borrowed_books'], myTotalBorrowedBooks, {
     onError: (error: ErrorResponse) => error,
   });
 
@@ -62,5 +78,13 @@ const totalUnreturnedBooks = () =>
 
 export const useTotalUnreturnedBooks = (): UseQueryResult<ResponseType> =>
   useQuery(['total_unreturned_books'], totalUnreturnedBooks, {
+    onError: (error: ErrorResponse) => error,
+  });
+
+const myTotalUnreturnedBooks = () =>
+  request({ url: '/dashboard/my_total_unreturned_books' });
+
+export const useMyTotalUnreturnedBooks = (): UseQueryResult<ResponseType> =>
+  useQuery(['my_total_unreturned_books'], myTotalUnreturnedBooks, {
     onError: (error: ErrorResponse) => error,
   });
