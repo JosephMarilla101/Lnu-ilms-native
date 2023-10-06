@@ -11,9 +11,9 @@ import {
 } from '../../hooks/useBook';
 import {
   useTotalBooks,
-  useTotalUnreturnedBooks,
-  useTotalRequestedBooks,
-  useTotalBorrowedBooks,
+  useMyTotalUnreturnedBooks,
+  useMyTotalRequestedBooks,
+  useMyTotalBorrowedBooks,
 } from '../../hooks/useDashboard';
 import { useVerifyToken } from '../../hooks/useAuth';
 import { format, parseISO, differenceInDays, isAfter } from 'date-fns';
@@ -27,9 +27,9 @@ export default function TabHomeScreen() {
   const getBookLateFee = useGetBookLateFee();
 
   const totalBooks = useTotalBooks();
-  const totalUnreturnedBooks = useTotalUnreturnedBooks();
-  const totalRequestedBooks = useTotalRequestedBooks();
-  const totalBorrowedBooks = useTotalBorrowedBooks();
+  const myTotalUnreturnedBooks = useMyTotalUnreturnedBooks();
+  const myTotalRequestedBooks = useMyTotalRequestedBooks();
+  const myTotalBorrowedBooks = useMyTotalBorrowedBooks();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -40,9 +40,9 @@ export default function TabHomeScreen() {
     unreturnedBook.refetch();
 
     totalBooks.refetch();
-    totalUnreturnedBooks.refetch();
-    totalRequestedBooks.refetch();
-    totalBorrowedBooks.refetch();
+    myTotalUnreturnedBooks.refetch();
+    myTotalRequestedBooks.refetch();
+    myTotalBorrowedBooks.refetch();
 
     setTimeout(() => {
       setRefreshing(false);
@@ -136,7 +136,7 @@ export default function TabHomeScreen() {
             <InterText
               style={[styles.cardText, { color: '#FF7276', marginTop: 5 }]}
             >
-              {totalUnreturnedBooks.data}
+              {myTotalUnreturnedBooks.data}
             </InterText>
 
             <InterText style={[styles.cardText, { color: '#FF7276' }]}>
@@ -157,7 +157,7 @@ export default function TabHomeScreen() {
                 { color: Colors['light'].secondary, marginTop: 5 },
               ]}
             >
-              {totalRequestedBooks.data}
+              {myTotalRequestedBooks.data}
             </InterText>
 
             <InterText
@@ -173,7 +173,7 @@ export default function TabHomeScreen() {
             <InterText
               style={[styles.cardText, { color: 'green', marginTop: 5 }]}
             >
-              {totalBorrowedBooks.data}
+              {myTotalBorrowedBooks.data}
             </InterText>
 
             <InterText style={[styles.cardText, { color: 'green' }]}>
