@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { useEffect, useState } from 'react';
 import Colors from '../constants/Colors';
 import { InterText } from '../components/StyledText';
-import { useChangePassword } from '../hooks/useStudent';
+import { useChangePassword } from '../hooks/useUser';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ModalScreen() {

@@ -14,7 +14,7 @@ import { Link } from 'expo-router';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
 import { useState } from 'react';
-import { useStudentRegistration } from '../../hooks/useStudent';
+import { useStudentRegistration } from '../../hooks/useUser';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const courseSelection = [
@@ -38,7 +38,7 @@ const Register = () => {
   const studentRegistration = useStudentRegistration();
 
   const [formData, setFormData] = useState({
-    studentId: '',
+    id: '',
     fullname: '',
     course: courseSelection[0],
     college: collegeSelection[0],
@@ -76,9 +76,9 @@ const Register = () => {
             maxLength={40}
             autoCapitalize='none'
             onChangeText={(text) =>
-              setFormData((prev) => ({ ...prev, studentId: text }))
+              setFormData((prev) => ({ ...prev, id: text }))
             }
-            value={formData.studentId}
+            value={formData.id}
             placeholder='Student ID'
             style={{
               ...styles.input,
