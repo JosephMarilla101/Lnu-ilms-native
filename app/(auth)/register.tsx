@@ -14,7 +14,11 @@ import { Link } from 'expo-router';
 import Colors from '../../constants/Colors';
 import { InterText } from '../../components/StyledText';
 import { useState } from 'react';
-import { useStudentRegistration } from '../../hooks/useUser';
+import {
+  useStudentRegistration,
+  useGraduateRegistration,
+  useTeacherRegistration,
+} from '../../hooks/useUser';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 const courseSelection = [
@@ -33,23 +37,50 @@ const courseSelection = [
 
 const collegeSelection = ['CAS', 'CME', 'COE'];
 
+const departmentSelection = [
+  'English Unit',
+  'Filipino Unit',
+  'HAE Unit',
+  'HRM & THRM Unit',
+  'IT UNIT',
+  'MAPEH UNIT',
+  'MATH UNIT',
+  'PROFED UNIT',
+  'SCIENCE UNIT',
+  'SOCIAL SCIENCE UNIT',
+  'SOCIAL WORK UNIT',
+];
+
+const accountTypeSelection = ['Student', 'Graduate', 'Teacher'];
+
 const Register = () => {
   const colorScheme = useColorScheme();
   const studentRegistration = useStudentRegistration();
+  const graduateRegistration = useGraduateRegistration();
+  const teacherRegistration = useTeacherRegistration();
 
   const [formData, setFormData] = useState({
     id: '',
     fullname: '',
     course: courseSelection[0],
     college: collegeSelection[0],
+    department: departmentSelection[0],
     mobile: '',
     email: '',
     password: '',
     password_confirmation: '',
   });
 
+  const [accountType, setAccountType] = useState(accountTypeSelection[0]);
+
   const handleRegister = () => {
-    studentRegistration.mutate(formData);
+    if (accountType === 'Student') {
+      studentRegistration.mutate(formData);
+    } else if (accountType === 'Graduate') {
+      graduateRegistration.mutate(formData);
+    } else {
+      teacherRegistration.mutate(formData);
+    }
   };
 
   return (
@@ -66,11 +97,37 @@ const Register = () => {
             color: Colors[colorScheme ?? 'light'].secondary,
           }}
         >
-          Student Registration
+          {accountType} Registration
         </InterText>
 
         <View style={styles.formContainer}>
-          <InterText style={styles.label}>Student ID:</InterText>
+          <View style={{ flexDirection: 'row', gap: 4 }}>
+            <View style={{ flex: 1 }}>
+              <InterText style={{ ...styles.label, marginBottom: 5 }}>
+                Account Type:
+              </InterText>
+              <View
+                style={{
+                  ...styles.select,
+                  borderColor: Colors[colorScheme ?? 'light'].primary,
+                }}
+              >
+                <Picker
+                  selectedValue={accountType}
+                  onValueChange={(itemValue) => setAccountType(itemValue)}
+                  prompt='Choose Account Type'
+                >
+                  {accountTypeSelection.map((type, i) => {
+                    return <Picker.Item label={type} value={type} key={i} />;
+                  })}
+                </Picker>
+              </View>
+            </View>
+          </View>
+
+          <InterText style={styles.label}>
+            {accountType === 'Teacher' ? 'Employee' : 'Student'} ID:
+          </InterText>
           <TextInput
             editable
             maxLength={40}
@@ -79,7 +136,9 @@ const Register = () => {
               setFormData((prev) => ({ ...prev, id: text }))
             }
             value={formData.id}
-            placeholder='Student ID'
+            placeholder={
+              accountType === 'Teacher' ? 'Employee ID' : 'Student ID'
+            }
             style={{
               ...styles.input,
               borderColor: Colors[colorScheme ?? 'light'].primary,
@@ -137,55 +196,92 @@ const Register = () => {
             cursorColor={'gray'}
           />
 
-          <View style={{ flexDirection: 'row', gap: 4 }}>
-            <View style={{ flex: 0.5 }}>
-              <InterText style={styles.label}>Course:</InterText>
-              <View
-                style={{
-                  ...styles.select,
-                  borderColor: Colors[colorScheme ?? 'light'].primary,
-                }}
-              >
-                <Picker
-                  selectedValue={formData.course}
-                  onValueChange={(itemValue) =>
-                    setFormData((prev) => ({ ...prev, course: itemValue }))
-                  }
-                  prompt='Course'
+          {accountType === 'Teacher' && (
+            <View style={{ flexDirection: 'row', gap: 4 }}>
+              <View style={{ flex: 1 }}>
+                <InterText style={styles.label}>Department:</InterText>
+                <View
+                  style={{
+                    ...styles.select,
+                    borderColor: Colors[colorScheme ?? 'light'].primary,
+                  }}
                 >
-                  {courseSelection.map((course, i) => {
-                    return (
-                      <Picker.Item label={course} value={course} key={i} />
-                    );
-                  })}
-                </Picker>
+                  <Picker
+                    selectedValue={formData.department}
+                    onValueChange={(itemValue) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        department: itemValue,
+                      }))
+                    }
+                    prompt='Department'
+                  >
+                    {departmentSelection.map((department, i) => {
+                      return (
+                        <Picker.Item
+                          label={department}
+                          value={department}
+                          key={i}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
               </View>
             </View>
+          )}
 
-            <View style={{ flex: 0.5 }}>
-              <InterText style={styles.label}>College:</InterText>
-              <View
-                style={{
-                  ...styles.select,
-                  borderColor: Colors[colorScheme ?? 'light'].primary,
-                }}
-              >
-                <Picker
-                  selectedValue={formData.college}
-                  onValueChange={(itemValue) =>
-                    setFormData((prev) => ({ ...prev, college: itemValue }))
-                  }
-                  prompt='College'
+          {accountType === 'Student' && (
+            <View style={{ flexDirection: 'row', gap: 4 }}>
+              <View style={{ flex: 0.5 }}>
+                <InterText style={styles.label}>Course:</InterText>
+                <View
+                  style={{
+                    ...styles.select,
+                    borderColor: Colors[colorScheme ?? 'light'].primary,
+                  }}
                 >
-                  {collegeSelection.map((college, i) => {
-                    return (
-                      <Picker.Item label={college} value={college} key={i} />
-                    );
-                  })}
-                </Picker>
+                  <Picker
+                    selectedValue={formData.course}
+                    onValueChange={(itemValue) =>
+                      setFormData((prev) => ({ ...prev, course: itemValue }))
+                    }
+                    prompt='Course'
+                  >
+                    {courseSelection.map((course, i) => {
+                      return (
+                        <Picker.Item label={course} value={course} key={i} />
+                      );
+                    })}
+                  </Picker>
+                </View>
+              </View>
+
+              <View style={{ flex: 0.5 }}>
+                <InterText style={styles.label}>College:</InterText>
+                <View
+                  style={{
+                    ...styles.select,
+                    borderColor: Colors[colorScheme ?? 'light'].primary,
+                  }}
+                >
+                  <Picker
+                    selectedValue={formData.college}
+                    onValueChange={(itemValue) =>
+                      setFormData((prev) => ({ ...prev, college: itemValue }))
+                    }
+                    prompt='College'
+                  >
+                    {collegeSelection.map((college, i) => {
+                      return (
+                        <Picker.Item label={college} value={college} key={i} />
+                      );
+                    })}
+                  </Picker>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           <InterText style={styles.label}>Password:</InterText>
           <TextInput
@@ -300,7 +396,7 @@ const styles = StyleSheet.create({
   formContainer: {
     maxWidth: 350,
     width: '100%',
-    marginTop: 15,
+    marginTop: 10,
   },
   section: {
     flexDirection: 'row',
