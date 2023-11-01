@@ -8,8 +8,31 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { request } from '../utils/axios-interceptor';
 import { useAuth } from '../context/AuthContext';
 
+export type AuthenticateUserRes = {
+  id: number;
+  role: 'STUDENT' | 'TEACHER' | 'GRADUATE';
+  email: string;
+  username?: string;
+  profile?: Profile;
+  status: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type Profile = {
+  id: number;
+  fullname?: string;
+  profilePhoto?: string;
+  profilePhotoId?: string;
+  department?: string;
+  course?: string;
+  college?: string;
+  mobile?: string;
+  userId: number;
+};
+
 const studentLogin = (data: { email: string; password: string }) =>
-  request({ url: '/auth/login/student', method: 'post', data });
+  request({ url: '/auth/login/user', method: 'post', data });
 
 export const useStudentLogin = () => {
   const queryClient = useQueryClient();
@@ -24,22 +47,10 @@ export const useStudentLogin = () => {
     onError: (error: ErrorResponse) => error,
   });
 };
-type VerifyTokenResponse = {
-  id: number;
-  studentId: number;
-  email: string;
-  fullname: string;
-  profilePhoto?: string;
-  course: string;
-  college: string;
-  mobile: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 const verifyToken = () => request({ url: '/auth' });
 
-export const useVerifyToken = (): UseQueryResult<VerifyTokenResponse> =>
+export const useVerifyToken = (): UseQueryResult<AuthenticateUserRes> =>
   useQuery(['auth'], verifyToken, {
     refetchOnWindowFocus: false,
     retry: false,

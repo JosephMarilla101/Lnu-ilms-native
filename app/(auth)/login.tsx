@@ -60,7 +60,7 @@ const Login = () => {
           color: Colors[colorScheme ?? 'light'].secondary,
         }}
       >
-        Student Login
+        User Login
       </InterText>
 
       <View style={styles.formContainer}>

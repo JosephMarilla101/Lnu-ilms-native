@@ -16,10 +16,24 @@ import { Link, router } from 'expo-router';
 import { InterText } from '../components/StyledText';
 import { useEffect, useState } from 'react';
 import Colors from '../constants/Colors';
-import { useUpdateProfile, useUpdateProfilePhoto } from '../hooks/useStudent';
+import { useUpdateProfile, useUpdateProfilePhoto } from '../hooks/useUser';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { useVerifyToken } from '../hooks/useAuth';
 import { Ionicons } from '@expo/vector-icons';
+
+const departmentSelection = [
+  'English Unit',
+  'Filipino Unit',
+  'HAE Unit',
+  'HRM & THRM Unit',
+  'IT UNIT',
+  'MAPEH UNIT',
+  'MATH UNIT',
+  'PROFED UNIT',
+  'SCIENCE UNIT',
+  'SOCIAL SCIENCE UNIT',
+  'SOCIAL WORK UNIT',
+];
 
 const courseSelection = [
   'BSIT',
@@ -44,10 +58,11 @@ export default function ModalScreen() {
   const updateProfilePhoto = useUpdateProfilePhoto();
   const imageUploader = useImageUpload();
   const [formData, setFormData] = useState({
-    fullname: auth.data?.fullname ?? '',
-    course: auth.data?.course ?? courseSelection[0],
-    college: auth.data?.college ?? collegeSelection[0],
-    mobile: auth.data?.mobile ?? '',
+    fullname: auth.data?.profile?.fullname ?? '',
+    course: auth.data?.profile?.course ?? courseSelection[0],
+    college: auth.data?.profile?.college ?? collegeSelection[0],
+    department: auth.data?.profile?.department ?? departmentSelection[0],
+    mobile: auth.data?.profile?.mobile ?? '',
     email: auth.data?.email ?? '',
   });
 
@@ -101,6 +116,7 @@ export default function ModalScreen() {
         fullname: '',
         course: courseSelection[0],
         college: collegeSelection[0],
+        department: departmentSelection[0],
         mobile: '',
         email: '',
       });
@@ -126,10 +142,10 @@ export default function ModalScreen() {
           >
             {!image ? (
               <>
-                {auth.data?.profilePhoto ? (
+                {auth.data?.profile?.profilePhoto ? (
                   <Image
                     source={{
-                      uri: auth.data?.profilePhoto,
+                      uri: auth.data?.profile?.profilePhoto,
                     }}
                     style={styles.image}
                   />
@@ -231,6 +247,95 @@ export default function ModalScreen() {
             cursorColor={'gray'}
           />
 
+          {/* Render only if role is teacher */}
+          {auth.data?.role === 'TEACHER' && (
+            <View style={{ flexDirection: 'column' }}>
+              <View>
+                <InterText style={styles.label}>Department:</InterText>
+                <View
+                  style={{
+                    ...styles.select,
+                    borderColor: Colors[colorScheme ?? 'light'].primary,
+                  }}
+                >
+                  <Picker
+                    selectedValue={formData.department}
+                    onValueChange={(itemValue) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        department: itemValue,
+                      }))
+                    }
+                    prompt='Department'
+                  >
+                    {departmentSelection.map((department, i) => {
+                      return (
+                        <Picker.Item
+                          label={department}
+                          value={department}
+                          key={i}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
+              </View>
+            </View>
+          )}
+
+          {/* Render only if role is student */}
+          {auth.data?.role === 'STUDENT' && (
+            <View style={{ flexDirection: 'column' }}>
+              <View>
+                <InterText style={styles.label}>Course:</InterText>
+                <View
+                  style={{
+                    ...styles.select,
+                    borderColor: Colors[colorScheme ?? 'light'].primary,
+                  }}
+                >
+                  <Picker
+                    selectedValue={formData.course}
+                    onValueChange={(itemValue) =>
+                      setFormData((prev) => ({ ...prev, course: itemValue }))
+                    }
+                    prompt='Course'
+                  >
+                    {courseSelection.map((course, i) => {
+                      return (
+                        <Picker.Item label={course} value={course} key={i} />
+                      );
+                    })}
+                  </Picker>
+                </View>
+              </View>
+
+              <View>
+                <InterText style={styles.label}>College:</InterText>
+                <View
+                  style={{
+                    ...styles.select,
+                    borderColor: Colors[colorScheme ?? 'light'].primary,
+                  }}
+                >
+                  <Picker
+                    selectedValue={formData.college}
+                    onValueChange={(itemValue) =>
+                      setFormData((prev) => ({ ...prev, college: itemValue }))
+                    }
+                    prompt='College'
+                  >
+                    {collegeSelection.map((college, i) => {
+                      return (
+                        <Picker.Item label={college} value={college} key={i} />
+                      );
+                    })}
+                  </Picker>
+                </View>
+              </View>
+            </View>
+          )}
+
           <InterText style={styles.label}>Mobile #:</InterText>
           <TextInput
             editable
@@ -246,56 +351,6 @@ export default function ModalScreen() {
             }}
             cursorColor={'gray'}
           />
-
-          <View style={{ flexDirection: 'column' }}>
-            <View>
-              <InterText style={styles.label}>Course:</InterText>
-              <View
-                style={{
-                  ...styles.select,
-                  borderColor: Colors[colorScheme ?? 'light'].primary,
-                }}
-              >
-                <Picker
-                  selectedValue={formData.course}
-                  onValueChange={(itemValue) =>
-                    setFormData((prev) => ({ ...prev, course: itemValue }))
-                  }
-                  prompt='Course'
-                >
-                  {courseSelection.map((course, i) => {
-                    return (
-                      <Picker.Item label={course} value={course} key={i} />
-                    );
-                  })}
-                </Picker>
-              </View>
-            </View>
-
-            <View>
-              <InterText style={styles.label}>College:</InterText>
-              <View
-                style={{
-                  ...styles.select,
-                  borderColor: Colors[colorScheme ?? 'light'].primary,
-                }}
-              >
-                <Picker
-                  selectedValue={formData.college}
-                  onValueChange={(itemValue) =>
-                    setFormData((prev) => ({ ...prev, college: itemValue }))
-                  }
-                  prompt='College'
-                >
-                  {collegeSelection.map((college, i) => {
-                    return (
-                      <Picker.Item label={college} value={college} key={i} />
-                    );
-                  })}
-                </Picker>
-              </View>
-            </View>
-          </View>
 
           {updateProfile.isError && (
             <View

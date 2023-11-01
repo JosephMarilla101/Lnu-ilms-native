@@ -1,22 +1,10 @@
 import { router, useRootNavigation, useSegments } from 'expo-router';
 import { createContext, useContext, useEffect, useState } from 'react';
+import type { AuthenticateUserRes } from '../hooks/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type User = {
-  id: number;
-  studentId: number;
-  email: string;
-  fullname: string;
-  profilePhoto?: string;
-  course: string;
-  college: string;
-  mobile: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 type AuthType = {
-  user: User | null;
+  user: AuthenticateUserRes | null;
   verifying: boolean;
 };
 interface AuthProps {

@@ -56,10 +56,10 @@ const Profile = () => {
             paddingHorizontal: 10,
           }}
         >
-          {auth.user?.profilePhoto ? (
+          {auth.user?.profile?.profilePhoto ? (
             <Image
               source={{
-                uri: auth.user.profilePhoto,
+                uri: auth.user.profile?.profilePhoto,
               }}
               style={styles.image}
             />
@@ -84,10 +84,16 @@ const Profile = () => {
                 fontSize: 26,
               }}
             >
-              {`${auth.user?.fullname}`}
+              {`${auth.user?.profile?.fullname}`}
             </InterText>
             <InterText style={styles.text}>
-              {`${auth.user?.studentId} (${auth.user?.course})`}
+              {`${auth.user?.profile?.id} (${
+                auth.user?.role === 'TEACHER'
+                  ? auth.user.profile?.department
+                  : auth.user?.role === 'GRADUATE'
+                  ? 'GRADUATE'
+                  : auth.user?.profile?.course
+              })`}
             </InterText>
 
             <Link href='/editProfile' asChild>
@@ -102,26 +108,47 @@ const Profile = () => {
           <InterText style={styles.header}>Profile Information</InterText>
 
           <View style={styles.infoContainer}>
-            <InterText style={styles.textDesc}>Student #:</InterText>
+            <InterText style={styles.textDesc}>
+              {auth.user?.role === 'TEACHER' ? 'Employee #:' : 'Student #:'}
+            </InterText>
             <InterText style={styles.textData}>
-              {auth.user?.studentId}
+              {auth.user?.profile?.id}
             </InterText>
           </View>
 
           <View style={styles.infoContainer}>
             <InterText style={styles.textDesc}>Full Name:</InterText>
-            <InterText style={styles.textData}>{auth.user?.fullname}</InterText>
+            <InterText style={styles.textData}>
+              {auth.user?.profile?.fullname}
+            </InterText>
           </View>
 
-          <View style={styles.infoContainer}>
-            <InterText style={styles.textDesc}>College:</InterText>
-            <InterText style={styles.textData}>{auth.user?.college}</InterText>
-          </View>
+          {auth.user?.role === 'STUDENT' && (
+            <View>
+              <View style={styles.infoContainer}>
+                <InterText style={styles.textDesc}>College:</InterText>
+                <InterText style={styles.textData}>
+                  {auth.user?.profile?.college}
+                </InterText>
+              </View>
 
-          <View style={styles.infoContainer}>
-            <InterText style={styles.textDesc}>Course:</InterText>
-            <InterText style={styles.textData}>{auth.user?.course}</InterText>
-          </View>
+              <View style={styles.infoContainer}>
+                <InterText style={styles.textDesc}>Course:</InterText>
+                <InterText style={styles.textData}>
+                  {auth.user?.profile?.course}
+                </InterText>
+              </View>
+            </View>
+          )}
+
+          {auth.user?.role === 'TEACHER' && (
+            <View style={styles.infoContainer}>
+              <InterText style={styles.textDesc}>Department:</InterText>
+              <InterText style={styles.textData}>
+                {auth.user?.profile?.department}
+              </InterText>
+            </View>
+          )}
 
           <View style={styles.infoContainer}>
             <InterText style={styles.textDesc}>Email:</InterText>
@@ -130,7 +157,9 @@ const Profile = () => {
 
           <View style={styles.infoContainer}>
             <InterText style={styles.textDesc}>Mobile:</InterText>
-            <InterText style={styles.textData}>{auth.user?.mobile}</InterText>
+            <InterText style={styles.textData}>
+              {auth.user?.profile?.mobile}
+            </InterText>
           </View>
 
           <View style={styles.infoContainer}>
