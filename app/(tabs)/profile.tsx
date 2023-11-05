@@ -109,7 +109,11 @@ const Profile = () => {
 
           <View style={styles.infoContainer}>
             <InterText style={styles.textDesc}>
-              {auth.user?.role === 'TEACHER' ? 'Employee #:' : 'Student #:'}
+              {auth.user?.role === 'TEACHER'
+                ? 'Employee ID:'
+                : auth.user?.role === 'GRADUATE'
+                ? 'Graduate ID:'
+                : 'Student ID:'}
             </InterText>
             <InterText style={styles.textData}>
               {auth.user?.profile?.id}

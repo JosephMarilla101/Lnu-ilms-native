@@ -126,7 +126,12 @@ const Register = () => {
           </View>
 
           <InterText style={styles.label}>
-            {accountType === 'Teacher' ? 'Employee' : 'Student'} ID:
+            {accountType === 'Teacher'
+              ? 'Employee'
+              : accountType === 'Graduate'
+              ? 'Graduate'
+              : 'Student'}{' '}
+            ID:
           </InterText>
           <TextInput
             editable
@@ -137,7 +142,11 @@ const Register = () => {
             }
             value={formData.id}
             placeholder={
-              accountType === 'Teacher' ? 'Employee ID' : 'Student ID'
+              accountType === 'Teacher'
+                ? 'Employee ID'
+                : accountType === 'Graduate'
+                ? 'Graduate ID'
+                : 'Student ID'
             }
             style={{
               ...styles.input,
@@ -199,7 +208,7 @@ const Register = () => {
           {accountType === 'Teacher' && (
             <View style={{ flexDirection: 'row', gap: 4 }}>
               <View style={{ flex: 1 }}>
-                <InterText style={styles.label}>Department:</InterText>
+                <InterText style={styles.label}>Unit:</InterText>
                 <View
                   style={{
                     ...styles.select,
@@ -214,7 +223,7 @@ const Register = () => {
                         department: itemValue,
                       }))
                     }
-                    prompt='Department'
+                    prompt='Unit'
                   >
                     {departmentSelection.map((department, i) => {
                       return (
