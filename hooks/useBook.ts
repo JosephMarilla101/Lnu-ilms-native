@@ -97,7 +97,7 @@ export const useRequestBook = () =>
     onError: (error: ErrorResponse) => error,
   });
 
-const cancelRequest = (data: { bookId: number; studentId: number }) =>
+const cancelRequest = (data: { bookId: number; userId: number }) =>
   request({ url: '/book/cancel_request', method: 'delete', data });
 
 export const useCancelRequest = () =>
