@@ -43,7 +43,7 @@ const Book = ({
 
   const handleCancelRequest = () => {
     const id = auth.data?.id;
-    cancelRequest.mutate({ bookId, studentId: id ?? 0 });
+    cancelRequest.mutate({ bookId, userId: id ?? 0 });
   };
 
   const handleRequestBook = () => {
